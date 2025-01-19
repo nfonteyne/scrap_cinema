@@ -1,5 +1,3 @@
-URL_PATH="https://www.allocine.fr/_/showtimes/theater-C0012/d-2025-01-13/"
-
 URL_ROOT="https://www.allocine.fr/_/showtimes/theater-"
 
 CINEMAS = {

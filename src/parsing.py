@@ -43,24 +43,6 @@ def parse_person(data: dict, is_actor: bool = False) -> Optional[dict]:
     except Exception:
         return None
 
-def parse_seances(element: dict) -> Optional[dict]:
-    """Parse seances data into dictionary format."""
-    try:
-        cinema_id = 'test'
-        cinema_name = 'test'
-        showtimes = element.get('showtimes', {}).get('original', [])
-        
-        if not all([cinema_id, cinema_name, showtimes]):
-            return None
-            
-        return {
-            'cinemaId': cinema_id,
-            'cinemaName': cinema_name,
-            'showtimes': [ele['startsAt'] for ele in showtimes]
-        }
-    except Exception:
-        return None
-
 def parse_stats(stats_data: Optional[dict]) -> Optional[dict]:
     """Parse stats data into Stats object."""
     if not stats_data:
@@ -78,12 +60,12 @@ def parse_stats(stats_data: Optional[dict]) -> Optional[dict]:
     
 
 
-def parse_seances(element: dict) -> Optional[dict]:
+def parse_seances(element: dict, cinema_id, cinema_name) -> Optional[dict]:
     """Parse seances data into a Seance object."""
     try:
-        cinema_id = 'test'
-        cinema_name = 'test'
-        showtimes = element.get('showtimes', {}).get('original', [])
+        showtimes_original = element.get('showtimes', {}).get('original', [])
+        showtimes_local = element.get('showtimes', {}).get('local', [])
+        showtimes = [*showtimes_original,*showtimes_local]
         
         if not all([cinema_id, cinema_name, showtimes]):
             return None
@@ -93,17 +75,20 @@ def parse_seances(element: dict) -> Optional[dict]:
             time['startsAt'] for time in showtimes
         ]
         
-        return {
-            'cinemaId':cinema_id,
+        return {cinema_id :
+                {
             'cinemaName':cinema_name,
             'showtimes':parsed_showtimes
-        }
+                }
+                }
     except Exception:
         return None
 
-def parse_movie_data(element: dict) -> Optional[dict]:
+def parse_movie_data(element: dict, cinema_infos) -> Optional[dict]:
     """Parse movie data into Movie object. Returns None if required fields are missing."""
     try:
+        cinema_id = cinema_infos['cinema_id']
+        cinema_name = cinema_infos['cinema_name']
         movie = element.get('movie', {})
         movie_id = movie.get('id')
         title = movie.get('title')
@@ -121,10 +106,9 @@ def parse_movie_data(element: dict) -> Optional[dict]:
         actors = movie.get('cast', {}).get('edges', [])
         parsed_actors = [p for p in (parse_person(ele, is_actor=True) for ele in actors) if p is not None]
         
-        parsed_seances = parse_seances(element)
+        parsed_seances = parse_seances(element, cinema_id, cinema_name)
         
         return {movie_id: {
-            'movieId':movie_id,
             'title':title,
             'synopsis':synopsis,
             'posterUrl':get_url_from_nested(movie, 'poster', 'url'),
@@ -135,7 +119,7 @@ def parse_movie_data(element: dict) -> Optional[dict]:
             'certificate':get_url_from_nested(movie, 'releases', 0, 'certificate', 'label'),
             'directors':parsed_credits if parsed_credits else None,
             'actors':parsed_actors if parsed_actors else None,
-            'seances':parsed_seances}
+            'seances':[parsed_seances]}
         }
     except Exception:
         return None
@@ -147,16 +131,16 @@ def json_serial(obj):
         return obj.isoformat()
     raise TypeError ("Type %s not serializable" % type(obj))
 
-if __name__ == "__main__":
-    headers = {'Accept': 'application/json'}
-    response = requests.get(os.getenv('URL_PATH'), headers=headers)
+# if __name__ == "__main__":
+#     headers = {'Accept': 'application/json'}
+#     response = requests.get(URL_PATH, headers=headers)
 
 
 
-    structured_output = []
-    for element in response.json()["results"]:
-        movie_info = parse_movie_data(element)
-        structured_output.append(movie_info)
+#     structured_output = []
+#     for element in response.json()["results"]:
+#         movie_info = parse_movie_data(element)
+#         structured_output.append(movie_info)
 
-    with open('./result.json', 'w', encoding='utf8') as fp:
-        json.dump(structured_output, fp)
+#     with open('./result.json', 'w', encoding='utf8') as fp:
+#         json.dump(structured_output, fp)
