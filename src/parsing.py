@@ -1,9 +1,9 @@
 import requests
 from typing import Optional
 import os
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import json
-from conf import *
+import conf
 
 
 
@@ -124,6 +124,120 @@ def parse_movie_data(element: dict, cinema_infos) -> Optional[dict]:
     except Exception:
         return None
     
+def merge_movie_data(existing_data: dict, new_movie: dict) -> dict:
+    """Merge new movie data with existing data, properly organizing seances by cinema"""
+    if not new_movie:
+        return existing_data
+        
+    try:
+        movie_id = list(new_movie.keys())[0]
+        movie_data = new_movie[movie_id]
+        
+        # Safely get seances data
+        seances_list = movie_data.get('seances', [])
+        if not seances_list:
+            return existing_data
+            
+        new_seance = seances_list[0]  # Get first seance entry
+        if not new_seance:
+            return existing_data
+            
+        if movie_id in existing_data:
+            # Movie exists, update/append seances for specific cinema
+            for seance in seances_list:
+                if not seance:  # Skip if seance is None
+                    continue
+                    
+                cinema_id = list(seance.keys())[0]
+                
+                if 'seances' not in existing_data[movie_id]:
+                    existing_data[movie_id]['seances'] = {}
+                    
+                if cinema_id in existing_data[movie_id]['seances']:
+                    # Append new showtimes to existing cinema
+                    existing_showtimes = existing_data[movie_id]['seances'][cinema_id]['showtimes']
+                    new_showtimes = seance[cinema_id]['showtimes']
+                    # Create a set to remove duplicates
+                    unique_showtimes = list(set(existing_showtimes + new_showtimes))
+                    existing_data[movie_id]['seances'][cinema_id]['showtimes'] = sorted(unique_showtimes)
+                else:
+                    # Add new cinema entry
+                    existing_data[movie_id]['seances'][cinema_id] = seance[cinema_id]
+        else:
+            # New movie, initialize with reorganized seances
+            seances_dict = {}
+            for seance in seances_list:
+                if seance:  # Only process if seance is not None
+                    cinema_id = list(seance.keys())[0]
+                    seances_dict[cinema_id] = seance[cinema_id]
+            
+            movie_data['seances'] = seances_dict
+            existing_data[movie_id] = movie_data
+            
+        return existing_data
+        
+    except (KeyError, IndexError, TypeError) as e:
+        print(f"Error in merge_movie_data: {str(e)}")
+        return existing_data
+    
+def load_existing_database(file_path: str) -> dict:
+    """Load existing movie database if it exists, create new one if it doesn't"""
+    try:
+        with open(file_path, 'r', encoding='utf8') as fp:
+            return json.load(fp)
+    except (FileNotFoundError, json.JSONDecodeError):
+        # Return empty dictionary if file doesn't exist or is invalid
+        return {}
+
+def process_cinemas(dict_cinema: dict, url_root: str, days_range: int = 2) -> dict:
+    """Process multiple cinemas and dates, creating or updating the movie database"""
+    database_path = './result.json'
+    
+    # Initialize empty database if none exists
+    movie_database = {}
+    
+    # Process each day in range
+    for i in range(days_range):
+        day_date = (date.today() + timedelta(days=i)).strftime("%Y-%m-%d")
+        
+        # Process each cinema
+        for cinema_name, cinema_id in dict_cinema.items():
+            url_path = f"{url_root}{cinema_id}/d-{day_date}/"
+            
+            cinema_info = {
+                'cinema_id': cinema_id,
+                'cinema_name': cinema_name,
+                'url': url_path
+            }
+            
+            # Make API request
+            headers = {'Accept': 'application/json'}
+            try:
+                response = requests.get(url_path, headers=headers)
+                if response.status_code == 200:
+                    data = response.json()
+                    if "results" in data:
+                        for element in data["results"]:
+                            movie_info = parse_movie_data(element, cinema_info)
+                            if movie_info:
+                                movie_database = merge_movie_data(movie_database, movie_info)
+                else:
+                    print(f"Failed to fetch data for {cinema_name} on {day_date}: Status code {response.status_code}")
+            except requests.RequestException as e:
+                print(f"Error fetching data for {cinema_name}: {str(e)}")
+            except json.JSONDecodeError as e:
+                print(f"Error parsing JSON for {cinema_name}: {str(e)}")
+    
+    # Save database only if we have data
+    if movie_database:
+        try:
+            with open(database_path, 'w', encoding='utf8') as fp:
+                json.dump(movie_database, fp, default=json_serial)
+        except IOError as e:
+            print(f"Error saving database: {str(e)}")
+    
+    return movie_database
+    
 def json_serial(obj):
     """JSON serializer for objects not serializable by default json code"""
 
@@ -131,16 +245,9 @@ def json_serial(obj):
         return obj.isoformat()
     raise TypeError ("Type %s not serializable" % type(obj))
 
-# if __name__ == "__main__":
-#     headers = {'Accept': 'application/json'}
-#     response = requests.get(URL_PATH, headers=headers)
-
-
-
-#     structured_output = []
-#     for element in response.json()["results"]:
-#         movie_info = parse_movie_data(element)
-#         structured_output.append(movie_info)
-
-#     with open('./result.json', 'w', encoding='utf8') as fp:
-#         json.dump(structured_output, fp)
+if __name__ == "__main__":
+    dict_cinema = conf.CINEMAS
+    url_root = conf.URL_ROOT
+    
+    # Process all cinemas and create/update database
+    updated_database = process_cinemas(dict_cinema, url_root)
