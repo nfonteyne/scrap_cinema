@@ -119,7 +119,7 @@ def parse_movie_data(element: dict, cinema_infos) -> Optional[dict]:
             'certificate':get_url_from_nested(movie, 'releases', 0, 'certificate', 'label'),
             'directors':parsed_credits if parsed_credits else None,
             'actors':parsed_actors if parsed_actors else None,
-            'seances':[parsed_seances]}
+            'seances':parsed_seances}
         }
     except Exception:
         return None
@@ -132,25 +132,29 @@ def json_serial(obj):
     raise TypeError ("Type %s not serializable" % type(obj))
 
 
-def update_seance_info(movie_database:dict, movie_data:dict):
-    seances_list = movie_data.get(movie_key).get('seances')
-    movie_database[movie_key]['seances'].append(seances_list[0])
-    print(f'seance list : {seances_list}')
-    print(f'movie database seances {movie_database[movie_key]['seances']}')
+def update_seance_info(movie_database_seance:dict, seances_info:dict):
+    if seances_info:
+        seances_info_key = next(iter(seances_info))
+        if seances_info_key in movie_database_seance:
+            showtimes_list_new_cine = seances_info.get(seances_info_key).get('showtimes')
+            for showtime in showtimes_list_new_cine:
+                movie_database_seance.get(seances_info_key).get('showtimes').append(showtime)
+            print("all database show time list",movie_database_seance.get(seances_info_key).get('showtimes'))
+            print("new cine show time list : ",showtimes_list_new_cine)
+
 
 if __name__ == "__main__":
     dict_cinema = conf.CINEMAS
     url_root = conf.URL_ROOT
     
-    database_path = './result.json'
+    database_path = './data/result.json'
 
     # Initialize empty database if none exists
     movie_database = {}
 
     # Process each day in range
-    for i in range(1):
+    for i in range(4):
         day_date = (date.today() + timedelta(days=i)).strftime("%Y-%m-%d")
-        print(f'day_date = {day_date}')
         
         # Process each cinema
         for cinema_name, cinema_id in dict_cinema.items():
@@ -173,9 +177,11 @@ if __name__ == "__main__":
                         if movie_data:
                             movie_key = next(iter(movie_data))
                             if movie_key in movie_database:
-                                pass
+                                database_seance_info = movie_database.get(movie_key).get('seances')
+                                new_movie_seances_info = movie_data.get(movie_key).get('seances')
+                                update_seance_info(database_seance_info, new_movie_seances_info)
                             else:
-                                movie_database.update(movie_data)
+                                movie_database.update(movie_data) 
 
     if movie_database:
         try:

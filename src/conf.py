@@ -6,3 +6,5 @@ CINEMAS = {
     'UGC ciné Bercy': 'C0026',
     'UGC Cyrano': 'B0045'
 }
+
+DATABASE_PATH = ''
