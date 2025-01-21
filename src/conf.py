@@ -7,4 +7,4 @@ CINEMAS = {
     'UGC Cyrano': 'B0045'
 }
 
-DATABASE_PATH = ''
+DATABASE_PATH = './data/result.json'

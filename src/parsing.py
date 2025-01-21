@@ -139,21 +139,17 @@ def update_seance_info(movie_database_seance:dict, seances_info:dict):
             showtimes_list_new_cine = seances_info.get(seances_info_key).get('showtimes')
             for showtime in showtimes_list_new_cine:
                 movie_database_seance.get(seances_info_key).get('showtimes').append(showtime)
-            print("all database show time list",movie_database_seance.get(seances_info_key).get('showtimes'))
-            print("new cine show time list : ",showtimes_list_new_cine)
-
 
 if __name__ == "__main__":
     dict_cinema = conf.CINEMAS
     url_root = conf.URL_ROOT
-    
-    database_path = './data/result.json'
+    database_path = conf.DATABASE_PATH
 
     # Initialize empty database if none exists
     movie_database = {}
 
     # Process each day in range
-    for i in range(4):
+    for i in range(7):
         day_date = (date.today() + timedelta(days=i)).strftime("%Y-%m-%d")
         
         # Process each cinema
