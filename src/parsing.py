@@ -60,7 +60,7 @@ def parse_stats(stats_data: Optional[dict]) -> Optional[dict]:
     
 
 
-def parse_seances(element: dict, cinema_id, cinema_name) -> Optional[dict]:
+def parse_screening(element: dict, cinema_id, cinema_name) -> Optional[dict]:
     """Parse seances data into a Seance object."""
     try:
         showtimes_original = element.get('showtimes', {}).get('original', [])
@@ -68,7 +68,7 @@ def parse_seances(element: dict, cinema_id, cinema_name) -> Optional[dict]:
         showtimes = [*showtimes_original,*showtimes_local]
         
         if not all([cinema_id, cinema_name, showtimes]):
-            return None
+            return {}
             
         # Convert string timestamps to datetime objects
         parsed_showtimes = [
@@ -106,7 +106,7 @@ def parse_movie_data(element: dict, cinema_infos) -> Optional[dict]:
         actors = movie.get('cast', {}).get('edges', [])
         parsed_actors = [p for p in (parse_person(ele, is_actor=True) for ele in actors) if p is not None]
         
-        parsed_seances = parse_seances(element, cinema_id, cinema_name)
+        parsed_seances = parse_screening(element, cinema_id, cinema_name)
         
         return {movie_id: {
             'title':title,
@@ -135,6 +135,7 @@ def json_serial(obj):
 def update_seance_info(movie_database_seance:dict, seances_info:dict):
     if seances_info:
         seances_info_key = next(iter(seances_info))
+        print(seances_info_key)
         if seances_info_key in movie_database_seance:
             showtimes_list_new_cine = seances_info.get(seances_info_key).get('showtimes')
             for showtime in showtimes_list_new_cine:
@@ -182,7 +183,7 @@ if __name__ == "__main__":
     if movie_database:
         try:
             with open(database_path, 'w', encoding='utf8') as fp:
-                json.dump(movie_database, fp, default=json_serial)
+                json.dump(movie_database, fp, default=json_serial, ensure_ascii=False)
         except IOError as e:
             print(f"Error saving database: {str(e)}")
                             
