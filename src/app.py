@@ -4,11 +4,15 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import json
 import conf
+from pathlib import Path
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
+app.mount(
+    "/static",
+    StaticFiles(directory=Path(__file__).parent.parent.absolute() / "static"),
+    name="static",
+)
 
 templates = Jinja2Templates(directory="templates")
 
@@ -46,7 +50,11 @@ async def get_movie_by_id(request: Request, id:str):
     return templates.TemplateResponse(
         request=request, name="movie.html", context={"title": title,
                                                      "synopsis": synopsis,
-                                                     "posterUrl": posterUrl
-                                                     
+                                                     "posterUrl": posterUrl,
+                                                     "runtime": runtime,
+                                                     "genre": genre,
+                                                     "directors": directors,
+                                                     "actors": actors,
+                                                     "seances": seances
                                                      }
     )

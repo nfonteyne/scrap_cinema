@@ -1,0 +1,38 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: rgb(20, 20, 20);
+    color: white;
+}
+
+.movie-backgound {
+
+}
+
+.movie-title {
+
+}
+
+.movie-title h1 {
+
+}
+
+.poster-synopsis {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.movie-poster {
+    width: 100px;
+    height: 100px;
+    background-color: violet;
+    margin-right: 10px;
+}
+
+.movie-synopsis {
+    width: 100px;
+    height: 100px;
+    background-color: blue;
+}
+
+
+

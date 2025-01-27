@@ -2,26 +2,22 @@
 <head>
     <title>Movie Details</title>
     <link href="{{ url_for('static', path='/movie.css') }}" rel="stylesheet">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <!-- <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/> -->
 </head>
 <body>
     <div class="movie-background">
-        <div class="movie title">
-            <h1>test</h1>
+        <div class="movie-title">
             <h1>{{ title }}</h1>
         </div>
 
-        <div class="poster">
-            <h1>{{ posterUrl }}</h1>
+        <div class="poster-synopsis">
+            <div class="movie-poster">
+                <img src="{{ posterUrl }}" alt="poster image">
+            </div>
+            <div class="movie-synopsis">
+                <h1>{{ synopsis }}</h1>
+            </div>
         </div>
-
-        <div class="synopsis">
-            <h1>{{ synopsis }}</h1>
-        </div>
-
-        
-
     </div>
-
 </body>
 </html>
