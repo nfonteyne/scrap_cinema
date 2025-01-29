@@ -11,12 +11,18 @@
         </div>
 
         <div class="poster-synopsis">
-            <div class="movie-poster">
+            <!-- <div class="movie-poster"> -->
                 <img src="{{ posterUrl }}" alt="poster image">
-            </div>
-            <div class="movie-synopsis">
-                <h1>{{ synopsis }}</h1>
-            </div>
+            <!-- </div> -->
+            <!-- <div class="movie-synopsis"> -->
+                <p>{{ synopsis }}</p>
+                <p>{{ runtime }}</p>
+                {% for genre_ele in genre %}
+                <p>{{ genre_ele }}</p>
+                {% endfor %}
+
+
+            <!-- </div> -->
         </div>
     </div>
 </body>

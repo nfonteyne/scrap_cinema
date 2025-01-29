@@ -1,38 +1,64 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: rgb(20, 20, 20);
-    color: white;
+    background-color: #FFFFD5;
+    color: black;
 }
 
-.movie-backgound {
+div {
+    border: 1px solid black;
+  }
 
-}
+/* .movie-backgound {
+
+} */
 
 .movie-title {
-
+    text-align: center;
+    vertical-align: middle;
+    line-height: 90px;
 }
 
-.movie-title h1 {
+/* .movie-title h1 {
 
-}
+} */
 
 .poster-synopsis {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    text-align: center;
+    vertical-align: middle;
 }
 
-.movie-poster {
-    width: 100px;
-    height: 100px;
-    background-color: violet;
-    margin-right: 10px;
+.poster-synopsis img {
+    height: 50%;
+    width: auto;
+    float: left;
+}
+
+.poster-synopsis p {
+    width: auto;
+    height: auto;
+    float: right;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* .movie-poster {
+    width: 30%;
+    height: auto;
+    float: left;
+}
+
+.movie-poster img {
+ width: 100%;
+ height: auto;
 }
 
 .movie-synopsis {
-    width: 100px;
-    height: 100px;
-    background-color: blue;
-}
+    width: 65%;
+    height: auto;
+    float: right;
+    text-align: center;
+    vertical-align: middle;
+} */
 
 
 
