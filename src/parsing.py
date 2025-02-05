@@ -135,11 +135,14 @@ def json_serial(obj):
 def update_seance_info(movie_database_seance:dict, seances_info:dict):
     if seances_info:
         seances_info_key = next(iter(seances_info))
-        print(seances_info_key)
         if seances_info_key in movie_database_seance:
             showtimes_list_new_cine = seances_info.get(seances_info_key).get('showtimes')
             for showtime in showtimes_list_new_cine:
                 movie_database_seance.get(seances_info_key).get('showtimes').append(showtime)
+        else:
+            movie_database_seance[seances_info_key]=seances_info.get(seances_info_key)
+    
+    
 
 if __name__ == "__main__":
     dict_cinema = conf.CINEMAS

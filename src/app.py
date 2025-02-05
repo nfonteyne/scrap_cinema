@@ -5,6 +5,10 @@ from fastapi.templating import Jinja2Templates
 import json
 import conf
 from pathlib import Path
+from datetime import datetime
+
+import locale
+locale.setlocale(locale.LC_TIME, 'fr_FR')
 
 app = FastAPI()
 
@@ -16,6 +20,20 @@ app.mount(
 
 templates = Jinja2Templates(directory="templates")
 
+def readable_showtimes(seances:dict):
+    show_dict = {}
+    for key,_ in seances.items():
+        cine = seances.get(key).get('cinemaName')
+        for showtime in seances.get(key).get('showtimes'):
+            readable_date = datetime.strptime(showtime, '%Y-%m-%dT%H:%M:%S').strftime('%A %m-%d')
+            readable_time = datetime.strptime(showtime, '%Y-%m-%dT%H:%M:%S').strftime('%H:%M:%S')
+            if not readable_date in show_dict:
+                show_dict[readable_date] = {}
+            if not cine in show_dict[readable_date]:
+                show_dict[readable_date][cine] = [readable_time]
+            else:
+                show_dict[readable_date][cine].append(readable_time)
+    return show_dict
 
 @app.get("/items/{id}", response_class=HTMLResponse)
 async def read_item(request: Request, id: str):
@@ -32,8 +50,13 @@ async def get_home_page(request: Request):
 async def get_movie_by_id(request: Request, id:str):
     with open(conf.DATABASE_PATH, encoding='utf-8') as fh:
         data = json.load(fh)
-    # id test : TW92aWU6MjkwNTgz
-    title = data.get(id).get('title')
+    # id test : TW92aWU6MzE4NDkw
+    print(data.get(id))
+    try:
+        title = data.get(id).get('title')
+    except:
+        print("cant get the name id")
+
     synopsis = data.get(id).get('synopsis')
     posterUrl = data.get(id).get('posterUrl')
     runtime = data.get(id).get('runtime')
@@ -43,9 +66,8 @@ async def get_movie_by_id(request: Request, id:str):
     pressRating = data.get(id).get('pressRating')
     directors = data.get(id).get('directors')
     actors = data.get(id).get('actors')
-    seances = data.get(id).get('seances')
-
-
+    seances = readable_showtimes(data.get(id).get('seances'))
+    print(seances)
 
     return templates.TemplateResponse(
         request=request, name="movie.html", context={"title": title,
@@ -53,8 +75,7 @@ async def get_movie_by_id(request: Request, id:str):
                                                      "posterUrl": posterUrl,
                                                      "runtime": runtime,
                                                      "genre": genre,
-                                                     "directors": directors,
-                                                     "actors": actors,
+                                                     "directors": directors, "actors": actors,
                                                      "seances": seances
                                                      }
     )
