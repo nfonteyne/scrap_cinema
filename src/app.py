@@ -20,19 +20,23 @@ app.mount(
 
 templates = Jinja2Templates(directory="templates")
 
-def readable_showtimes(seances:dict):
+def readable_showtimes(seances:dict) -> dict:
     show_dict = {}
     for key,_ in seances.items():
-        cine = seances.get(key).get('cinemaName')
-        for showtime in seances.get(key).get('showtimes'):
-            readable_date = datetime.strptime(showtime, '%Y-%m-%dT%H:%M:%S').strftime('%A %m-%d')
-            readable_time = datetime.strptime(showtime, '%Y-%m-%dT%H:%M:%S').strftime('%H:%M:%S')
-            if not readable_date in show_dict:
-                show_dict[readable_date] = {}
-            if not cine in show_dict[readable_date]:
-                show_dict[readable_date][cine] = [readable_time]
-            else:
-                show_dict[readable_date][cine].append(readable_time)
+        seance_hours_by_cine = seances.get(key)
+        if None == seance_hours_by_cine:
+            continue
+        if seance_hours_by_cine:
+            cine = seance_hours_by_cine.get('cinemaName')
+            for showtime in seance_hours_by_cine.get('showtimes'):
+                readable_date = datetime.strptime(showtime, '%Y-%m-%dT%H:%M:%S').strftime('%A %m-%d')
+                readable_time = datetime.strptime(showtime, '%Y-%m-%dT%H:%M:%S').strftime('%H:%M:%S')
+                if not readable_date in show_dict:
+                    show_dict[readable_date] = {}
+                if not cine in show_dict[readable_date]:
+                    show_dict[readable_date][cine] = [readable_time]
+                else:
+                    show_dict[readable_date][cine].append(readable_time)
     return show_dict
 
 @app.get("/items/{id}", response_class=HTMLResponse)
@@ -52,11 +56,7 @@ async def get_movie_by_id(request: Request, id:str):
         data = json.load(fh)
     # id test : TW92aWU6MzE4NDkw
     print(data.get(id))
-    try:
-        title = data.get(id).get('title')
-    except:
-        print("cant get the name id")
-
+    title = data.get(id).get('title')
     synopsis = data.get(id).get('synopsis')
     posterUrl = data.get(id).get('posterUrl')
     runtime = data.get(id).get('runtime')

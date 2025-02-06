@@ -1,6 +1,5 @@
 import requests
 from typing import Optional
-import os
 from datetime import datetime, date, timedelta
 import json
 import conf
@@ -16,7 +15,7 @@ def get_url_from_nested(data: dict, *keys) -> Optional[str]:
         current = current.get(key)
         if current is None:
             return None
-    return current
+    return str(current)
 
 def parse_person(data: dict, is_actor: bool = False) -> Optional[dict]:
     """Parse person data into Person object. Returns None if required fields are missing."""
