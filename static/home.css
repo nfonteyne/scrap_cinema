@@ -6,7 +6,8 @@ body {
 }
 
 .movie-info {
-    padding: 0 15px;
+    width: 70%;
+    padding: 15 15px;
     /* padding top bottom to 0px, left right to 15px */
     display: flex;
     /* align child element horizontally*/
@@ -14,17 +15,18 @@ body {
     /* move child element to the next line if not enough space */
     align-items: center;
     /* vertically align the items inside the container */
-    justify-content: space-around;
-    gap: 5rem;
+    /* justify-content: space-around; */
+    /* gap: 5rem; */
 }
 
 .movie-info img {
     width: 100%;
-    max-width: 300px;
+    max-width: 200px;
     object-fit: cover;
     /* cover the entire container while maintaining aspect ratio*/
     vertical-align: middle;
-    border-radius: 10px;
+    border-radius: 30px;
+    padding: 15 15px;
 }
 
 .movie-text {
@@ -64,6 +66,10 @@ body {
     border-radius: 10px;
 }
 
+.movie-synopsis {
+    text-align: justify;
+    text-justify: auto;
+}
 
 /* Style the tab */
 .tab {

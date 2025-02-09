@@ -4,8 +4,6 @@ from datetime import datetime, date, timedelta
 import json
 import conf
 
-
-
 def get_url_from_nested(data: dict, *keys) -> Optional[str]:
     """Extract URL from nested dictionary structure."""
     current = data
