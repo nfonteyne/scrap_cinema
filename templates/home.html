@@ -12,10 +12,11 @@
     {% for movie_key, movie_items in movies_dict.items() %}
     <div class="movie-info">
         <div class="movie-poster">
-            <img src="{{ movie_items.posterUrl }}" alt="poster image">
+            <a href="http://localhost:8000/movie/{{movie_key}}"><img src="{{ movie_items.posterUrl }}"
+                    alt="poster image"></a>
         </div>
         <div class="movie-text">
-            <h1>{{ movie_items.title }}</h1>
+            <h1><a href="http://localhost:8000/movie/{{movie_key}}">{{ movie_items.title }}</a></h1>
             <p>{{ movie_items.runtime }}</p>
             <div class="movie-genre">
                 <p> genre : </p>

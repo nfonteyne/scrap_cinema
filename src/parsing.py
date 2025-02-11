@@ -3,6 +3,7 @@ from typing import Optional
 from datetime import datetime, date, timedelta
 import json
 import conf
+import html
 
 def get_url_from_nested(data: dict, *keys) -> Optional[str]:
     """Extract URL from nested dictionary structure."""
@@ -139,7 +140,23 @@ def update_seance_info(movie_database_seance:dict, seances_info:dict):
         else:
             movie_database_seance[seances_info_key]=seances_info.get(seances_info_key)
     
-    
+def clean_text_for_json(text):
+    if isinstance(text, str):
+        # First decode HTML entities (converts &#039; to ')
+        text = html.unescape(text)
+        # Then normalize any Unicode apostrophes
+        text = text.replace('\u2019', "'")
+        text = text.replace('\u2018', "'")
+        return text
+    return text
+
+def clean_dict_for_json(d):
+    if isinstance(d, dict):
+        return {k: clean_dict_for_json(v) for k, v in d.items()}
+    elif isinstance(d, list):
+        return [clean_dict_for_json(item) for item in d]
+    else:
+        return clean_text_for_json(d)
 
 if __name__ == "__main__":
     dict_cinema = conf.CINEMAS
@@ -183,7 +200,8 @@ if __name__ == "__main__":
     if movie_database:
         try:
             with open(database_path, 'w', encoding='utf8') as fp:
-                json.dump(movie_database, fp, default=json_serial, ensure_ascii=False)
+                movie_database_cleaned = clean_dict_for_json(movie_database)
+                json.dump(movie_database_cleaned, fp, default=json_serial, ensure_ascii=False)
         except IOError as e:
             print(f"Error saving database: {str(e)}")
                             

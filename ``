@@ -5,25 +5,9 @@ body {
     color: black;
 }
 
-a {
-    color: black;
-    text-decoration: None;
-}
-
-/* Mouse Over Link */
-a:hover {
-    color: #2706e2;
-    text-decoration: underline;
-}
-
-/* .movie-poster:hover, */
-/* a:hover { */
-/*     background-color: skyblue; */
-/* } */
-
 .movie-info {
     width: 70%;
-    padding: 15 30px;
+    padding: 15 15px;
     /* padding top bottom to 0px, left right to 15px */
     display: flex;
     /* align child element horizontally*/
@@ -31,10 +15,8 @@ a:hover {
     /* move child element to the next line if not enough space */
     align-items: center;
     background-color: #627BB4;
-    /* padding: 15 Opx; */
-    /* gap: 2rem; */
-    border-radius: 30px;
-    margin-bottom: 30px;
+    padding: 15 0px;
+    gap: 2rem;
     /* vertically align the items inside the container */
     /* justify-content: space-around; */
     /* gap: 5rem; */
