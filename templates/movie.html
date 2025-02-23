@@ -46,14 +46,7 @@
         </div>
     </div>
     <div class="movie-cast">
-        {% for director in directors %}
-        <div>
-            <!-- <p>{{ director.position}}</p> -->
-            <img src="{{ director.pictureUrl}}" alt="director picture">
-            <p>{{ director.firstName}} {{ director.lastName}} </p>
-        </div>
-        {% endfor %}
-
+        <p>Casting :</p>
         {% for actor in actors %}
         <div>
             <!-- <p>{{ actor.position}}</p> -->
@@ -61,6 +54,16 @@
             <img src="{{ actor.pictureUrl }}" alt="actor picture">
             {% endif %}
             <p>{{ actor.firstName }} {{ actor.lastName}}</p>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="movie-cast">
+        <p>Réalisation :</p>
+        {% for director in directors %}
+        <div>
+            <!-- <p>{{ director.position}}</p> -->
+            <img src="{{ director.pictureUrl}}" alt="director picture">
+            <p>{{ director.firstName}} {{ director.lastName}} </p>
         </div>
         {% endfor %}
     </div>
